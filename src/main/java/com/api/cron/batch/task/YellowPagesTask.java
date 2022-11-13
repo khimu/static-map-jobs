@@ -1,6 +1,7 @@
 package com.api.cron.batch.task;
 
 import java.util.Iterator;
+import java.util.Objects;
 
 import javax.annotation.Resource;
 
@@ -27,6 +28,8 @@ public class YellowPagesTask implements Task {
 	private Iterator<Element> businesses;
 	
 	private Element currentElement;
+
+	private Element pageElement;
 	
 	private int totalBusinesses;
 	
@@ -54,6 +57,7 @@ public class YellowPagesTask implements Task {
 			*/
 			
 			businesses = doc.select("div[class=info]").iterator(); // loses website
+
 			
 			if(businesses != null && businesses.hasNext()) {
 				currentElement = businesses.next();
@@ -61,7 +65,9 @@ public class YellowPagesTask implements Task {
 			else {
 				currentElement = null;
 			}
-			
+
+			getPageLink();
+
 			Elements page = doc.select("span[class=disabled]");
 			for(Element pa : page) {
 				currentPage = Integer.parseInt(pa.text());
@@ -85,6 +91,7 @@ public class YellowPagesTask implements Task {
 	public void next() {
 		if(businesses.hasNext()) {
 			currentElement = businesses.next();
+			getPageLink();
 		}
 		else {
 			currentElement = null;
@@ -108,7 +115,26 @@ public class YellowPagesTask implements Task {
 		}
 		return null;
 	}
-	
+
+	public void getPageLink() {
+		try {
+			Elements pageLinkElement = currentElement.getElementsByClass("business-name");
+
+			if(pageLinkElement != null && !pageLinkElement.isEmpty()) {
+				for(Element b : pageLinkElement) {
+					String pageLink = b.attr("href");
+					if(Objects.nonNull(pageLink)) {
+						Document doc = Jsoup.connect("https://www.yellowpages.com" + pageLink).get();
+						pageElement = doc.body();
+					}
+				}
+			}
+		}catch(Exception e) {
+			logger.error("Unable to retrieve business name");
+		}
+	}
+
+
 	public String getNextCity(){
 		try {
 			Elements addrs = currentElement.getElementsByClass("locality");
@@ -199,7 +225,20 @@ public class YellowPagesTask implements Task {
 		return null;
 		
 	}
-	
+
+	public String getEmail() {
+		if(Objects.nonNull(pageElement)) {
+			Elements pageElements = pageElement.getElementsByClass("email-business");
+			if (Objects.nonNull(pageElements)) {
+				for (Element pw : pageElements) {
+					if (Objects.nonNull(pw.attr("href"))) {
+						return pw.attr("href").split(":")[1];
+					}
+				}
+			}
+		}
+		return null;
+	}
 	
 	public String getNextWebsite() {
 		try {
@@ -207,9 +246,18 @@ public class YellowPagesTask implements Task {
 			if(website != null && !website.isEmpty()) {
 				for(Element p : website) {
 					if(p.attr("href") != null) {
-						return p.attr("href").substring(0,  p.attr("href").indexOf("cid"));
+						return p.attr("href");
 					}
-					return null;
+				}
+				if(Objects.nonNull(pageElement)) {
+					Elements pageElements = pageElement.getElementsByClass("other-links");
+					if (Objects.nonNull(pageElements)) {
+						for (Element pw : pageElements) {
+							if (Objects.nonNull(pw.attr("href"))) {
+								return pw.attr("href");
+							}
+						}
+					}
 				}
 			}
 		}catch(Exception e) {

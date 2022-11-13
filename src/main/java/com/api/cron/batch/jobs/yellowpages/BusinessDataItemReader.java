@@ -155,10 +155,15 @@ public class BusinessDataItemReader implements ItemReader<BusinessItem> {
 			for(Topic naic : naicsCategory) {
 				int pages = buildInfos(naic, DEFAULT_PAGE);
 				logger.info("Total pages " + pages);
-				if(pages > 1) {
-					for(int i = 2; i < pages; i ++) {
+				if(pages > 0) {
+					for(int i = 1; i < pages; i ++) {
 						try {
-							YellowPageInfo info = new YellowPageMetadataBuilder().setNaics(naic).setCategory(naic.getCode()).setLocation(city + ", " + state).setPage(i+"").execute(); 
+							YellowPageMetadataBuilder builder = new YellowPageMetadataBuilder().setNaics(naic).setCategory(naic.getCode()).setLocation(city + "%2C%20" + state);
+							if(i > 1) {
+								builder.setPage(i + "");
+							}
+
+							YellowPageInfo info = builder.execute();
 							infos.add(info);
 						} catch (UnsupportedEncodingException e) {
 							logger.error(e.getMessage());
@@ -174,8 +179,11 @@ public class BusinessDataItemReader implements ItemReader<BusinessItem> {
 	
 	private int buildInfos(Topic naic, String page) {
 		try {
-			YellowPageInfo info = new YellowPageMetadataBuilder().setNaics(naic).setCategory(naic.getCode()).setLocation(city + ", " + state).setPage(page).execute(); 
-			
+			YellowPageMetadataBuilder builder = new YellowPageMetadataBuilder().setNaics(naic).setCategory(naic.getCode()).setLocation(city + "%2C%20" + state);
+			if(Integer.parseInt(page) > 1) {
+				builder.setPage(page);
+			}
+			YellowPageInfo info = builder.execute();
 			// get the first page and determine how many results for the given category and location
 			YellowPagesTask task = new YellowPagesTask();
 			
@@ -241,6 +249,7 @@ public class BusinessDataItemReader implements ItemReader<BusinessItem> {
 					store.setName(storeName);
 					store.setWebsite(task.getNextWebsite());
 					store.setPhoneNumber(task.getNextPhones() == null ? "" : task.getNextPhones());
+					store.setEmailAddress(task.getEmail());
 					store.setState(state);
 					store.setCity(task.getNextCity());
 					store.setAddressLine1(task.getNextStreetAddress());

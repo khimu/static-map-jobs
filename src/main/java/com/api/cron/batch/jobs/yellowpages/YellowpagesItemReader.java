@@ -64,8 +64,12 @@ public class YellowpagesItemReader implements ItemReader<StoresItem> {
 		}
 
 		try {
-			YellowPageInfo info = new YellowPageMetadataBuilder().setNaics(null).setCategory(link.getCategory()).setLocation(link.getCity() + ", " + link.getState()).setPage(link.getPage().toString()).execute(); 
+			YellowPageMetadataBuilder builder = new YellowPageMetadataBuilder().setNaics(null).setCategory(link.getCategory()).setLocation(link.getCity() + ", " + link.getState());
+			if(link.getPage() > 1) {
+				builder.setPage(link.getPage().toString());
+			}
 
+			YellowPageInfo info = builder.execute();
 			logger.info("working on " + info.getServiceEndpoint() + " for id range " + fromId + " " + toId);
 			
 			YellowPagesTask task = new YellowPagesTask();
@@ -87,6 +91,7 @@ public class YellowpagesItemReader implements ItemReader<StoresItem> {
 					store.setName(storeName);
 					store.setWebsite(task.getNextWebsite());
 					store.setPhoneNumber(task.getNextPhones() == null ? "" : task.getNextPhones());
+					store.setEmailAddress(task.getEmail());
 					store.setState(link.getState());
 					store.setCity(task.getNextCity());
 					store.setAddressLine1(task.getNextStreetAddress());

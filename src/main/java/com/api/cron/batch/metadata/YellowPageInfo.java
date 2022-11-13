@@ -33,7 +33,7 @@ public class YellowPageInfo implements TaskInfo {
 	
 	public static class YellowPageMetadataBuilder {
 		private final static Logger logger = LoggerFactory.getLogger(YellowPageMetadataBuilder.class);
-		private String serviceEndpoint = "http://www.yellowpages.com/search?search_terms={category}&geo_location_terms={location}&page={page}";
+		private String serviceEndpoint = "http://www.yellowpages.com/search?search_terms={category}&geo_location_terms={location}";
 		private Map<String, String> placeholder = new HashMap<String, String>();
 		private Topic naics;
 
@@ -54,6 +54,7 @@ public class YellowPageInfo implements TaskInfo {
 		}
 		
 		public YellowPageMetadataBuilder setPage(String page) {
+			this.serviceEndpoint = this.serviceEndpoint + "&page={page}";
 			this.placeholder.put("\\{page\\}", page);
 			return this;
 		}
