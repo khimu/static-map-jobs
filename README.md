@@ -22,7 +22,7 @@ Usage
 Note 
 	After creating topics table run command below
 
-  	mysql -uroot -p -h business.cpmenyilehdo.us-east-1.rds.amazonaws.com  --local-infile=1 -e "use business; LOAD DATA LOCAL INFILE '/opt/yellowpages-data/topics.csv' INTO TABLE topic #FIELDS TERMINATED BY '\t' ENCLOSED BY '' LINES STARTING BY '' TERMINATED BY '\n' (code);"
+  	mysql -uroot -p -h business.cpmenyilehdo.us-east-1.rds.amazonaws.com  --local-infile=1 -e "use business; LOAD DATA LOCAL INFILE '/opt/yellowpages-data/topics.csv' INTO TABLE topic (code);"
 
 
 
