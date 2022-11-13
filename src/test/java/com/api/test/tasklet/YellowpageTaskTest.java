@@ -16,6 +16,11 @@ public class YellowpageTaskTest {
         YellowPagesTask task = new YellowPagesTask();
         task.execute(info);
 
+
+        int count = task.getTotalBusinesses();
+
+        System.out.println("size " + count);
+
         while (task.hasNext()) {
             String email = task.getEmail();
             String website = task.getNextWebsite();
@@ -27,6 +32,7 @@ public class YellowpageTaskTest {
             if (Objects.nonNull(website)) {
                 System.out.println(website);
             }
+
 
             task.next();
         }

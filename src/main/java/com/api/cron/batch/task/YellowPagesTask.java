@@ -72,10 +72,17 @@ public class YellowPagesTask implements Task {
 			for(Element pa : page) {
 				currentPage = Integer.parseInt(pa.text());
 			}
-			
-			Elements totalPages = doc.select("div[class=pagination] p");
+
+			/**
+			 * Becareful this changes over time.  It was p and now it's span
+			 */
+			Elements totalPages = doc.select("div[class=pagination] span");
 			for(Element t : totalPages) {
-				totalBusinesses = Integer.parseInt( StringUtils.trim( t.text().substring( t.text().indexOf("of ") + 2, t.text().indexOf("results") ) ) );
+				totalBusinesses = Integer.parseInt(t.text().split(" of ")[1]);
+				if(totalBusinesses > 0) {
+					break;
+				}
+				//totalBusinesses = Integer.parseInt( StringUtils.trim( t.text().substring( t.text().indexOf("of ") + 2, t.text().indexOf("results") ) ) );
 			}
 			logger.info("totalBusinesses " + totalBusinesses);
 		}catch (Exception e) {
