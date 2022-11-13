@@ -16,7 +16,7 @@
 
 	<!-- Using properties file to replace properties in xml configuration file -->
 	<bean id="jobProperties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="location" value="file:/opt/sitemaps/googleapi.properties" />
+		<property name="location" value="file:/opt/yellowpages-data/googleapi.properties" />
 	</bean>	
 	
 	<util:map id="categories" map-class="java.util.HashMap">

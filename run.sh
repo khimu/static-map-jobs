@@ -1,1 +1,1 @@
-mvn clean install -DskipTests=true
+mvn3 clean install -DskipTests=true

@@ -1,8 +1,30 @@
+Setup
+
+Setup java8
+Create directory /opt/yellowpages-data/
+copy googleapi.properties, log4j2.xml, and app-all.jar from target directory
+create mysql database and tables
+insert data accordingly
+copy all the executable bash scripts to the directory
+when using aws ec2, create the VPC, create the ec2, create the RDS for the EC2, Create documentDB, and then update googleapi.properties
+To scp, add your id_rsa.pub to .ssh/authorized_keys in ec2 instance
+make sure to change user from root to ec2-root
+
+scp api-scrapper-executable.jar ec2-user@54.210.48.70:/opt/yellowpages-data/app-all.jar
+
+
 # Allows for creating a platform independent script to run jar
 gradle wrapper
 
 Usage
   java -jar -Xmx2048m -Xms1024m -Dlog4j.configuration="file:/opt/log4j2.xml" target/api-scrapper-executable.jar cleanStoreJob spring/batch/jobs/clean-store-data.xml /opt/geocode/google.properties
+
+Note 
+	After creating topics table run command below
+
+  	mysql -uroot -p -h business.cpmenyilehdo.us-east-1.rds.amazonaws.com  --local-infile=1 -e "use business; LOAD DATA LOCAL INFILE '/opt/yellowpages-data/topics.csv' INTO TABLE topic #FIELDS TERMINATED BY '\t' ENCLOSED BY '' LINES STARTING BY '' TERMINATED BY '\n' (code);"
+
+
 
 
 -Dlogging.config='/path/to/log4j2.xml'
@@ -127,6 +149,12 @@ CREATE TABLE IF NOT EXISTS yellowpages_links (
   PRIMARY KEY (id)
 ) ENGINE=InnoDB;
 
+CREATE TABLE IF NOT EXISTS topic (
+  id BIGINT(11) NOT NULL AUTO_INCREMENT,
+  code VARCHAR(150) DEFAULT NULL,
+  PRIMARY KEY (id)
+) ENGINE=InnoDB;
+
 
 -- must meet google daily api quota
 INSERT INTO `business`.`job_state`
@@ -167,6 +195,7 @@ VALUES('cleanStoreJob',0,25000,0,0,0,now());
 INSERT INTO `business`.`job_state`
 (`job_name`,`last_processed_key`,`quota`,`already_exist`,`success`,`failed`,`last_processed_date`)
 VALUES('cleanScrapperJob',0,25000,0,0,0,now());
+
 
 
 INSERT IGNORE

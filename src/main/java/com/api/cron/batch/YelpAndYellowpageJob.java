@@ -148,6 +148,8 @@ public class YelpAndYellowpageJob implements BatchJob {
 					builder.addString("quota", crons.get(0).getQuota() + "");
 					builder.addString("lastProcessedKey", crons.get(0).getLastProcessedKey() + "");
 					builder.addString("jobName", jobName);
+
+					logger.info("args3 is " + args[3] + " args4 is " + args[4]);
 					
 					String city = args[3].split("=")[1];
 					String state = args[4].split("=")[1];
